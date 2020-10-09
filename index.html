@@ -1,42 +1,36 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <title>TIC TAC TOE</title>
-    </head>
-    <body>
-        <div class="wrapper">
-            <div class="container">
-                <h1>Welcome</h1>            
-                <form class="form">
-                    <input type="text" placeholder="Username">
-                    <input type="password" placeholder="Password">
-                    <button type="submit" id="login-button">Login</button>
-                </form>
-            </div>
-            
-            <ul class="bg-bubbles">
-                <li></li>
-                <li></li>
-                <li></li>
-                <li></li>
-                <li></li>
-                <li></li>
-                <li></li>
-                <li></li>
-                <li></li>
-                <li></li>
-            </ul>
-        </div>
-        <div class="game-board">
-            <div class="cell" data-index="0"></div>
-            <div class="cell" data-index="1"></div>
-            <div class="cell" data-index="2"></div>
-            <div class="cell" data-index="3"></div>
-            <div class="cell" data-index="4"></div>
-            <div class="cell" data-index="5"></div>
-            <div class="cell" data-index="6"></div>
-            <div class="cell" data-index="7"></div>
-            <div class="cell" data-index="8"></div>
-        </div>
-    </body>
+
+<head>
+    <title>TIC TAC TOE</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <h1>TIC TAC TOE!</h1>
+    <div class="contact-us">
+        <form>
+            <input id="playerOneName" placeholder="Player 1" type="text" />
+            <input id="playerTwoName" placeholder="Player 2" type="text" />
+            <button class="start" type="button">PLAY</button>
+        </form>
+    </div>
+    <div class="game-board hide">
+        <div class="cell" data-index="0"></div>
+        <div class="cell" data-index="1"></div>
+        <div class="cell" data-index="2"></div>
+        <div class="cell" data-index="3"></div>
+        <div class="cell" data-index="4"></div>
+        <div class="cell" data-index="5"></div>
+        <div class="cell" data-index="6"></div>
+        <div class="cell" data-index="7"></div>
+        <div class="cell" data-index="8"></div>
+    </div>
+    <div class="names hide">
+        <p id="playerOne" class="highlight">Player 1 (X)</p>
+        <p id="playerTwo">Player 2 (O)</p>
+    </div>
+    <script src="script.js"></script>
+</body>
+
 </html>

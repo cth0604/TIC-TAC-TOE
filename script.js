@@ -1,32 +1,100 @@
 const game = (() => {
-    let isX = true;
-    const changeTurn = function() {
-        isX = !isX;
-    };
-    const getIsX = function() {
-        return isX;
+    let _isX = true;
+    let _isDone = false;
+    const _updateNames = function () {
+        const playerOneName = document.querySelector('#playerOneName');
+        const playerTwoName = document.querySelector('#playerTwoName');
+        const playerOneNameDisplay = document.querySelector('#playerOne');
+        const playerTwoNameDisplay = document.querySelector('#playerTwo');
+        if (playerOneName.value !== '') {
+            console.log(playerOneNameDisplay);
+            playerOneNameDisplay.innerHTML = playerOneName.value + ' (X)';
+        }
+        if (playerTwoName.value !== '') {
+            playerTwoNameDisplay.innerHTML = playerTwoName.value + ' (O)';
+        }
     }
-    const displayResult = function() {
+    const changeTurn = function () {
+        _isX = !_isX;
+        const playerOne = document.querySelector('#playerOne');
+        const playerTwo = document.querySelector('#playerTwo');
+        playerOne.classList.toggle('highlight');
+        playerTwo.classList.toggle('highlight');
+    };
+    const getIsX = function () {
+        return _isX;
+    }
+    const getIsDone = function () {
+        return _isDone;
+    }
+    const displayResult = function (result = 'not tie') {
+        const playerOne = document.querySelector('#playerOne');
+        const playerTwo = document.querySelector('#playerTwo');
+        if (result === 'tie') {
+            playerOne.innerHTML = 'It\'s a tie!';
+            playerTwo.innerHTML = '';
+        } else {
+            if (_isX) {
+                playerOne.innerHTML += ', Victory!';
+                playerTwo.innerHTML += ', Defeat...';
+            } else {
+                playerOne.innerHTML += ', Defeat...';
+                playerTwo.innerHTML += ', Victory!...';
+            }
+        }
+        _isDone = true;
+    }
+    const start = function() {
         //***
-    } 
-    const restart = function() {
-        isX = true;
+        const form = document.querySelector('.contact-us');
+        form.classList.add('hide');
+        const gameBoard = document.querySelector('.game-board');
+        gameBoard.classList.remove('hide');
+        const names = document.querySelector('.names');
+        names.classList.remove('hide');
+        _updateNames();
+    }
+    const restart = function () {
+        _isX = true;
         gameBoard.resetBoard();
     }
     return {
+        start,
         restart,
         getIsX,
         changeTurn,
         displayResult,
+        getIsDone,
     };
 })();
 
 const gameBoard = (() => {
     let _board = [false, false, false, false, false, false, false, false, false];
-    const _checkOver = function() {
-        //***
+    let p1Rows = [0, 0, 0];
+    let p1Columns = [0, 0, 0];
+    let p2Rows = [0, 0, 0];
+    let p2Columns = [0, 0, 0];
+    let p1Dig = [0, 0];
+    let p2Dig = [0, 0];
+    const _checkOver = function () {
+        const checkThree = function (element, index, array) {
+            return element === 3;
+        };
+        if (game.getIsX()) {
+            if (p1Rows.some(checkThree) || p1Columns.some(checkThree) || p1Dig.some(checkThree)) {
+                return true;
+            } 
+        } else {
+            if (p2Rows.some(checkThree) || p2Columns.some(checkThree) || p2Dig.some(checkThree)) {
+                return true;
+            } 
+        }
+        if (_board.every(element => element !== false)) {
+            return 'tie';
+        }
+        return false;
     };
-    const _render = function() {
+    const _render = function () {
         const cells = document.querySelectorAll('.cell');
         for (let i = 0; i < 9; i++) {
             if (_board[i]) {
@@ -34,16 +102,60 @@ const gameBoard = (() => {
             }
         }
     };
-    const resetBoard = function() {
+    const _getRowAndColIndices = function (index) {
+        let rowIndex;
+        let columIndex;
+        if (index < 3) {
+            rowIndex = 0;
+            columIndex = index;
+        } else if (index < 6) {
+            rowIndex = 1;
+            columIndex = index - 3;
+        } else {
+            rowIndex = 2;
+            columIndex = index - 6;
+        }
+        return [rowIndex, columIndex];
+    }
+    const _updateRowAndColIndices = function (index) {
+        const [rowIndex, colIndex] = _getRowAndColIndices(index);
+        if (game.getIsX()) {
+            p1Rows[rowIndex]++;
+            p1Columns[colIndex]++;
+            if (rowIndex === colIndex) {
+                p1Dig[0]++;
+            }
+            if (rowIndex + colIndex + 1 === 3) {
+                p1Dig[1]++;
+            }
+        } else {
+            p2Rows[rowIndex]++;
+            p2Columns[colIndex]++;
+            if (rowIndex === colIndex) {
+                p2Dig[0]++;
+            }
+            if (rowIndex + colIndex + 1 === 3) {
+                p2Dig[1]++;
+            } 
+        }
+    }
+    const resetBoard = function () {
         _board = _board.map(cell => false);
         _render();
     }
-    const mark = function(index) {
-        if (!_board[index]) {
-            _board[index] = game.getIsX ? 'X' : 'O'
+    const mark = function (e) {
+        const index = Number(e.target.dataset.index);
+        if (!_board[index] && !game.getIsDone()) {
+            _board[index] = game.getIsX() ? 'X' : 'O'
             _render();
-            if (_checkOver()) {
-                game.displayResult();
+            _updateRowAndColIndices(index);
+            isOver = _checkOver()
+            if (isOver) {
+                if (isOver === 'tie') {
+                    game.displayResult('tie');
+                } else {
+                    game.displayResult();
+                }
             } else {
                 game.changeTurn();
             };
@@ -56,14 +168,14 @@ const gameBoard = (() => {
 })();
 
 const Player = (name, isBot) => {
-    const play = function(e) {
-        const index = Number(e.target.dataset.index);
-        gameBoard.mark(index);
-    }
     return {
         name,
         isBot,
-        play,
     }
 }
 
+const startButton = document.querySelector('.start');
+startButton.addEventListener('click', game.start);
+
+const cells = document.querySelectorAll('.cell');
+cells.forEach((cell) => cell.addEventListener('click', gameBoard.mark));
