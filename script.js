@@ -9,9 +9,11 @@ const game = (() => {
         if (playerOneName.value !== '') {
             console.log(playerOneNameDisplay);
             playerOneNameDisplay.innerHTML = playerOneName.value + ' (X)';
+            playerOne = Player(playerOneName.value, false);
         }
         if (playerTwoName.value !== '') {
             playerTwoNameDisplay.innerHTML = playerTwoName.value + ' (O)';
+            playerTwo = Player(playerTwoName.value, false);
         }
     }
     const changeTurn = function () {
@@ -44,19 +46,22 @@ const game = (() => {
         }
         _isDone = true;
     }
-    const start = function() {
+    const start = function () {
         //***
         const form = document.querySelector('.contact-us');
         form.classList.add('hide');
-        const gameBoard = document.querySelector('.game-board');
-        gameBoard.classList.remove('hide');
-        const names = document.querySelector('.names');
-        names.classList.remove('hide');
+        const gameDisplay = document.querySelector('.game-display');
+        gameDisplay.classList.remove('hide');
         _updateNames();
     }
     const restart = function () {
+        _isDone = false;
         _isX = true;
         gameBoard.resetBoard();
+        const playerOneNameDisplay = document.querySelector('#playerOne');
+        const playerTwoNameDisplay = document.querySelector('#playerTwo');
+        playerOneNameDisplay.innerHTML = playerOne.name;
+        playerTwoNameDisplay.innerHTML = playerTwo.name;
     }
     return {
         start,
@@ -83,11 +88,11 @@ const gameBoard = (() => {
         if (game.getIsX()) {
             if (p1Rows.some(checkThree) || p1Columns.some(checkThree) || p1Dig.some(checkThree)) {
                 return true;
-            } 
+            }
         } else {
             if (p2Rows.some(checkThree) || p2Columns.some(checkThree) || p2Dig.some(checkThree)) {
                 return true;
-            } 
+            }
         }
         if (_board.every(element => element !== false)) {
             return 'tie';
@@ -99,6 +104,8 @@ const gameBoard = (() => {
         for (let i = 0; i < 9; i++) {
             if (_board[i]) {
                 cells[i].textContent = _board[i];
+            } else {
+                cells[i].textContent = '';
             }
         }
     };
@@ -136,12 +143,15 @@ const gameBoard = (() => {
             }
             if (rowIndex + colIndex + 1 === 3) {
                 p2Dig[1]++;
-            } 
+            }
         }
     }
     const resetBoard = function () {
         _board = _board.map(cell => false);
         _render();
+        [p1Rows, p1Columns, p1Dig, p2Rows, p2Columns, p2Dig].forEach(array => array.forEach(function (part, index, array) {
+            array[index] = 0;
+        }));
     }
     const mark = function (e) {
         const index = Number(e.target.dataset.index);
@@ -174,8 +184,14 @@ const Player = (name, isBot) => {
     }
 }
 
+let playerOne = Player('Player 1', false);
+let playerTwo = Player('Player 2', false);
+
 const startButton = document.querySelector('.start');
 startButton.addEventListener('click', game.start);
 
 const cells = document.querySelectorAll('.cell');
 cells.forEach((cell) => cell.addEventListener('click', gameBoard.mark));
+
+const restartButton = document.querySelector('.restart');
+restartButton.addEventListener('click', game.restart);

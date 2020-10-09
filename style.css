@@ -100,6 +100,10 @@ input:-webkit-autofill:focus {
 .cell {
   background-color: white;
   border: 5px solid black;
+  text-align: center;
+  padding: 20px 0px;
+  font-size: 60px;
+  font-family: "Fjalla One";
 }
 
 .hide {
@@ -123,4 +127,23 @@ input:-webkit-autofill:focus {
 
 .highlight {
   color: black;
+}
+
+.buttons {
+  position: fixed;
+  bottom: 100px;
+  left: 640px;
+}
+
+.restart {
+  display: inline;
+  width: 110px;
+  height: 40px;
+  margin-right: 10px;
+}
+
+.exit {
+  display: inline;
+  width: 110px;
+  height: 40px;
 }
